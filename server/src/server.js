@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import app from "./app.js";
 import { connectDatabase } from "./config/db.js";
 import { startReminderJob } from "./jobs/reminderJob.js";
@@ -17,4 +19,3 @@ bootstrap().catch((error) => {
   console.error("Failed to start server", error);
   process.exit(1);
 });
-

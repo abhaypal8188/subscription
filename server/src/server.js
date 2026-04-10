@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import "dotenv/config";
+=======
+>>>>>>> eeb6118 (ready to deploy)
 
 import app from "./app.js";
 import { connectDatabase } from "./config/db.js";

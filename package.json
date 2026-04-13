@@ -10,7 +10,8 @@
     "dev": "npm-run-all --parallel dev:server dev:client",
     "dev:client": "npm --workspace client run dev",
     "dev:server": "npm --workspace server run dev",
-    "build": "npm --workspace client run build && npm --workspace server run build",
+    "build": "npm --workspace client run build",
+    "start": "node server/src/server.js",
     "lint": "npm --workspace client run lint && npm --workspace server run lint"
   },
   "devDependencies": {

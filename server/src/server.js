@@ -1,3 +1,4 @@
+
 import app from "./app.js";
 import { connectDatabase } from "./config/db.js";
 import { startReminderJob } from "./jobs/reminderJob.js";

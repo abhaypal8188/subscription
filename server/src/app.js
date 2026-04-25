@@ -16,10 +16,64 @@ import { errorHandler, notFound } from "./middlewares/errorMiddleware.js";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const isServerlessRuntime = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
+const normalizeOrigin = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return new URL(value).origin;
+  } catch (_error) {
+    return value.replace(/\/$/, "");
+  }
+};
+
+const configuredOrigins = [
+  process.env.CLIENT_URL,
+  process.env.CLIENT_URL_PREVIEW,
+  process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : null,
+  process.env.ALLOWED_ORIGINS,
+]
+  .flatMap((value) => (value ? value.split(",") : []))
+  .map((value) => normalizeOrigin(value.trim()))
+  .filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) {
+    return true;
+  }
+
+  const normalizedOrigin = normalizeOrigin(origin);
+
+  if (configuredOrigins.includes(normalizedOrigin)) {
+    return true;
+  }
+
+  try {
+    const { hostname, protocol } = new URL(normalizedOrigin);
+    const isLocalhost = protocol === "http:" && ["localhost", "127.0.0.1"].includes(hostname);
+    const isVercelPreview = protocol === "https:" && hostname.endsWith(".vercel.app");
+    return isLocalhost || isVercelPreview;
+  } catch (_error) {
+    return false;
+  }
+};
+
+app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
@@ -42,7 +96,9 @@ app.use(
   }),
 );
 
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+if (!isServerlessRuntime) {
+  app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+}
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", service: "subscription-manager-api" });

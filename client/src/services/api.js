@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "../store/authStore.js";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_URL || "/api",
 });
 
 api.interceptors.response.use(

@@ -1,6 +1,6 @@
 # Smart Subscription Manager
 
-A production-style MERN SaaS starter for tracking subscriptions, reminders, analytics, and savings insights.
+A production-style MERN app for tracking subscriptions, reminders, analytics, and savings insights.
 
 ## Stack
 
@@ -16,26 +16,15 @@ A production-style MERN SaaS starter for tracking subscriptions, reminders, anal
 ```text
 /client
 /server
+/api
 ```
 
 ## Quick Start
 
-1. Install dependencies in the root workspace:
-
 ```bash
 npm install
-```
-
-2. Create environment files:
-
-```bash
 cp server/.env.example server/.env
 cp client/.env.example client/.env
-```
-
-3. Start development:
-
-```bash
 npm run dev
 ```
 
@@ -43,14 +32,54 @@ npm run dev
 
 - JWT access + refresh token auth
 - Subscription CRUD with logo uploads
-- Dashboard summary, charts, spending forecast, and AI-style savings tips
-- Reminder job scaffolding with email support
+- Dashboard analytics and savings insights
 - Admin overview endpoints and UI
-- PWA manifest + responsive SaaS layout
+- Reminder job scaffolding with email support
+- PWA manifest + responsive layout
 
 ## Deployment
 
-- Frontend: Vercel
+### Fullstack Vercel Deployment
+
+This repo is configured for a single Vercel project:
+
+- the frontend builds from `client/`
+- the backend runs from `api/index.js`
+- frontend API calls default to `/api`
+- SPA routes like `/subscriptions` fall back correctly on refresh
+
+Deploy from the repo root:
+
+```bash
+npm install
+vercel
+vercel --prod
+```
+
+Required Vercel environment variables:
+
+| Variable | Notes |
+|----------|-------|
+| `MONGODB_URI` | MongoDB Atlas connection string |
+| `JWT_SECRET` | Long random secret |
+| `JWT_REFRESH_SECRET` | Long random secret |
+| `CLIENT_URL` | Your production Vercel URL |
+| `VITE_API_URL` | Use `/api` for same-project deployment |
+
+Recommended for production:
+
+| Variable | Notes |
+|----------|-------|
+| `CLOUDINARY_CLOUD_NAME` | Required for logo uploads on Vercel |
+| `CLOUDINARY_API_KEY` | Cloudinary credential |
+| `CLOUDINARY_API_SECRET` | Cloudinary credential |
+| `CRON_SECRET` | Protects the reminder cron endpoint |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Needed for reminder emails |
+
+Full instructions: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
+
+### Separate Deployment
+
+- Frontend: Vercel / Netlify
 - Backend: Render / Railway
 - Database: MongoDB Atlas
-
